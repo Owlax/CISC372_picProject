@@ -84,12 +84,13 @@ void* threaded_convolute(void* args){
         }
     }
     int row = arguments->row;
-
+    printf("Rank %d", row);
     int pix,bit,span;
     span=srcImage->bpp*srcImage->bpp;
-    for(pix=0;pix<srcImage->width;pix++){
-        for (bit=0;bit<srcImage->bpp;bit++){
-            destImage->data[Index(pix,row,srcImage->width,bit,srcImage->bpp)]=getPixelValue(srcImage,pix,row,bit,algorithm);
+    
+    for (pix = 0; pix < srcImage->width; pix++){
+        for (bit = 0; bit < srcImage->bpp; bit++){
+            destImage->data[Index(pix, row, srcImage->width, bit, srcImage->bpp)] = getPixelValue(srcImage, pix, row, bit, algorithm);
         }
     }
 }
