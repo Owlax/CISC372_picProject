@@ -69,7 +69,7 @@ uint8_t getPixelValue(Image* srcImage,int x,int y,int bit,Matrix algorithm){
 typedef struct {
     Image* srcImage;
     Image* destImage;
-    Matrix* algo;
+    Matrix* algorithm;
     int row;
 } ThreadArgs;
 
@@ -77,14 +77,19 @@ void* threaded_convolute(void* args){
     ThreadArgs* arguments = (ThreadArgs*)args;
     Image* srcImage = arguments->srcImage;
     Image* destImage = arguments->destImage;
-    Matrix* algorithm = arguments->algo;
+    Matrix algorithm;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            algorithm[i][j] = *(arguments->algorithm[i][j]);
+        }
+    }
     int row = arguments->row;
 
     int pix,bit,span;
     span=srcImage->bpp*srcImage->bpp;
     for(pix=0;pix<srcImage->width;pix++){
         for (bit=0;bit<srcImage->bpp;bit++){
-            destImage->data[Index(pix,row,srcImage->width,bit,srcImage->bpp)]=getPixelValue(srcImage,pix,row,bit,*algorithm);
+            destImage->data[Index(pix,row,srcImage->width,bit,srcImage->bpp)]=getPixelValue(srcImage,pix,row,bit,algorithm);
         }
     }
 }
@@ -145,7 +150,7 @@ int main(int argc,char** argv){
 
 
     for (int row=0;row<(srcImage.height);row++){
-	ThreadArgs args = { &srcImage, &destImage, &algorithms[type], row };
+	ThreadArgs args = { &srcImage, &destImage, &(algorithms[type]), row };
         pthread_create(&thread_handles[row], NULL, threaded_convolute, (void*)&args);
     }
     //convolute(&srcImage,&destImage,algorithms[type]);
